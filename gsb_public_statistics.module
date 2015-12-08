@@ -16,7 +16,7 @@ function gsb_public_statistics_menu() {
     'access arguments' => array('administer nodes'),
   );
 
-  $items['admin/config/gsb/statistics/send-email'] = array(
+  $items['admin/config/gsb/statistics/statistics-email'] = array(
     'title' => 'Email Statistics Report',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gsb_public_statistics_send_status_mail'),
@@ -32,10 +32,10 @@ function gsb_public_statistics_menu() {
 function gsb_public_statistics_settings_form($form, $form_state) {
 
   $form['gsb_public_statistics_to_email'] = array(
-    '#title' => 'To Emails for gsb public statistics',
+    '#title' => 'Email(To Address)',
     '#type' => 'textfield',
     '#default_value' => variable_get('gsb_public_statistics_to_email', NULL),
-    '#description' => t('comma separated values.'),
+    '#description' => t('use comma separated values. sends out daily email to the address'),
   );
 
   return system_settings_form($form, $form_state);
