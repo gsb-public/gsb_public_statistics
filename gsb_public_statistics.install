@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the GSB Public Statistics.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function gsb_public_statistics_install() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function gsb_public_statistics_uninstall() {
+  variable_del('gsb_public_statistics_to_email');
+  variable_del('gsb_public_statistics_published_json_value');
+}

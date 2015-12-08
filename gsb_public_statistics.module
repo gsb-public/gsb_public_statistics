@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * @file gsb_public_statistics.module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function gsb_public_statistics_menu() {
+  $items = array();
+  $items['admin/config/gsb/statistics'] = array(
+    'title' => 'GSB Public Statistics Setting',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gsb_public_statistics_settings_form'),
+    'access arguments' => array('administer nodes'),
+  );
+
+  $items['admin/config/gsb/statistics/send-email'] = array(
+    'title' => 'Email Statistics Report',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gsb_public_statistics_send_status_mail'),
+    'access arguments' => array('administer nodes'),
+  );
+
+  return $items;
+}
+
+/**
+ * Admin configuration form for gsb cron emails
+ */
+function gsb_public_statistics_settings_form($form, $form_state) {
+
+  $form['gsb_public_statistics_to_email'] = array(
+    '#title' => 'To Emails for gsb public statistics',
+    '#type' => 'textfield',
+    '#default_value' => variable_get('gsb_public_statistics_to_email', NULL),
+    '#description' => t('comma separated values.'),
+  );
+
+  return system_settings_form($form, $form_state);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function gsb_public_statistics_cron() {
+  gsb_public_statistics_send_status_mail();
+}
+
+/**
+ * Implements hook_mail()
+ */
+function gsb_public_statistics_mail($key, &$message, $params) {
+  $headers = array(
+    'MIME-Version' => '1.0',
+    //'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+    'Content-Type' => 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    'Content-Transfer-Encoding' => '8Bit',
+    'X-Mailer' => 'Drupal',
+  );
+
+  foreach ($headers as $key => $value) {
+    $message['headers'][$key] = $value;
+  }
+
+  $message['subject'] = $params['subject'];
+  $message['body'] = $params['body'];
+}
+
+/**
+ * Sends node status email
+ */
+function gsb_public_statistics_send_status_mail() {
+  $from = variable_get('site_mail', 'webmaster@gsb.stanford.edu');
+  $address = variable_get('gsb_public_statistics_to_email', NULL); // Set this email address - emails will be sent to this email address! 
+  $header = array();
+  $rows = array();
+
+  // Get results for published nodes
+  $result = db_query('SELECT type, count(*) AS total FROM {node} WHERE status = 1 GROUP BY type');
+  $rows[] = array('', 'Published Nodes');
+  while ($record = $result->fetchObject()) {
+    $row = array($record->type, ' = ' . $record->total);
+    $rows[] = $row;
+  }
+
+  // Get results for unpublished nodes
+  $result = db_query('SELECT type, count(*) AS total FROM {node} WHERE status = 0 GROUP BY type');
+  $rows[] = array('', 'Unpublished Nodes');
+  while ($record = $result->fetchObject()) {
+    $row = array($record->type, ' = ' . $record->total);
+    $rows[] = $row;
+  }
+
+  // Save the json format
+  $json_value = drupal_json_encode($rows);
+  variable_set('gsb_public_statistics_published_json_value', $json_value);
+
+  // Convert array into table format
+  $body[] = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('width' => '100%')
+  ));
+
+  // Set the mail parameters
+  $params = array(
+    'body' => $body,
+    'subject' => t('gsbpublic cron - statistics report'),
+  );
+  $params['headers']['Content-Type'] = 'text/html; charset=UTF-8';
+
+  // Mail the node status report
+  $message = drupal_mail('gsb_public_statistics', 'statistics', $address, language_default(), $params, $from, TRUE);
+  if (!$message) {
+    watchdog('gsb_public_statistics', 'There was an error subscribing you. Please try again later');
+  }
+  else {
+    drupal_set_message('Cron statistics report was sent');
+  }
+}

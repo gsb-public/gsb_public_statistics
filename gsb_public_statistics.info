@@ -1,0 +1,5 @@
+name = GSB Public Statistics
+description = Runs cron and sends site statistics email.
+core = 7.x
+Package = GSB
+
