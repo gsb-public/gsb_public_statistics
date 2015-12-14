@@ -152,6 +152,6 @@ function gsb_public_statistics_send_status_mail() {
     }
   }
   else {
-    dpm($body);
+    drupal_set_message($body);
   }
 }
