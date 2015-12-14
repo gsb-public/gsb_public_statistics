@@ -79,7 +79,8 @@ function gsb_public_statistics_send_status_mail() {
   $result = db_query('SELECT type, count(*) AS total FROM {node} WHERE status = 1 GROUP BY type');
   while ($record = $result->fetchObject()) {
     $published_rows[] = array($record->type, $record->total);
-    if ($record->total <> $published_row_last_run[count($published_rows)-1][1]) {
+    $key = array_search($record->type, array_column($published_row_last_run, 0));
+    if ($record->total <> $published_row_last_run[$key][1]) {
       $published_rows_diffs[] = array($record->type, $record->total-$published_row_last_run[count($published_rows)-1][1]);
     }
   }
@@ -104,7 +105,8 @@ function gsb_public_statistics_send_status_mail() {
   $result = db_query('SELECT type, count(*) AS total FROM {node} WHERE status = 0 GROUP BY type');
   while ($record = $result->fetchObject()) {
     $unpublished_rows[] = array($record->type, $record->total);
-    if ($record->total <> $unpublished_row_last_run[count($unpublished_rows)-1][1]) {
+    $key = array_search($record->type, array_column($unpublished_row_last_run, 0));
+    if ($record->total <> $unpublished_row_last_run[$key][1]) {
       $unpublished_rows_diffs[] = array($record->type, $record->total-$unpublished_row_last_run[count($unpublished_rows)-1][1]);
     }
   }
