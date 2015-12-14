@@ -16,5 +16,7 @@ function gsb_public_statistics_install() {
  */
 function gsb_public_statistics_uninstall() {
   variable_del('gsb_public_statistics_to_email');
-  variable_del('gsb_public_statistics_published_json_value');
+  variable_del('gsb_public_statistics_enable_email');
+  variable_del('gsb_public_statistics_published_row_json');
+  variable_del('gsb_public_statistics_unpublished_row_json');
 }
