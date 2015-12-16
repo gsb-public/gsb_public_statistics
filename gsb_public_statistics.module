@@ -80,8 +80,23 @@ function gsb_public_statistics_send_status_mail() {
   while ($record = $result->fetchObject()) {
     $published_rows[] = array($record->type, $record->total);
     $key = array_search($record->type, array_column($published_row_last_run, 0));
-    if ($record->total <> $published_row_last_run[$key][1]) {
-      $published_rows_diffs[] = array($record->type, $record->total-$published_row_last_run[count($published_rows)-1][1]);
+    if ($published_row_last_run[$key][0] == $record->type && $record->total <> $published_row_last_run[$key][1]) {
+      $published_rows_diffs[] = array($record->type, $record->total-$published_row_last_run[$key][1]);
+    }
+  }
+
+  $diff_types = _gsb_public_statistics_array_values($published_rows);
+  $diff_types_last = _gsb_public_statistics_array_values($published_row_last_run);
+  $diff_merged = array_merge(array_diff($diff_types, $diff_types_last), array_diff($diff_types_last, $diff_types));
+  foreach ($diff_merged as $value) {
+    $search_key = array_search($value, array_column($published_rows, 0));
+    if ($search_key > -1) {
+      $published_rows_diffs[] = array($value, $published_rows[$search_key][1]);
+    }
+
+    $search_key = array_search($value, array_column($published_row_last_run, 0));
+    if ($search_key > -1) {
+      $published_rows_diffs[] = array($value, 0-$published_row_last_run[$search_key][1]);
     }
   }
 
@@ -93,11 +108,7 @@ function gsb_public_statistics_send_status_mail() {
   }
 
   // Wrap published data into table format
-  $body[] = theme('table', array(
-    'header' => array('<b>Published Nodes</b>',''),
-    'rows' => $published_rows,
-    'attributes' => array('width' => '60%')
-  ));
+  $body[] = gsb_public_statistics_render_table($published_rows, array('<b>Published Nodes</b>',''));
 
   // Get results for unpublished nodes
   $unpublished_rows_diffs = array();
@@ -106,8 +117,23 @@ function gsb_public_statistics_send_status_mail() {
   while ($record = $result->fetchObject()) {
     $unpublished_rows[] = array($record->type, $record->total);
     $key = array_search($record->type, array_column($unpublished_row_last_run, 0));
-    if ($record->total <> $unpublished_row_last_run[$key][1]) {
-      $unpublished_rows_diffs[] = array($record->type, $record->total-$unpublished_row_last_run[count($unpublished_rows)-1][1]);
+    if ($unpublished_row_last_run[$key][0] == $record->type && $record->total <> $unpublished_row_last_run[$key][1]) {
+      $unpublished_rows_diffs[] = array($record->type, $record->total-$unpublished_row_last_run[$key][1]);
+    }
+  }
+
+  $diff_types = _gsb_public_statistics_array_values($unpublished_rows);
+  $diff_types_last = _gsb_public_statistics_array_values($unpublished_row_last_run);
+  $diff_merged = array_merge(array_diff($diff_types, $diff_types_last), array_diff($diff_types_last, $diff_types));
+  foreach ($diff_merged as $value) {
+    $search_key = array_search($value, array_column($unpublished_rows, 0));
+    if ($search_key > -1) {
+      $unpublished_rows_diffs[] = array($value, $unpublished_rows[$search_key][1]);
+    }
+
+    $search_key = array_search($value, array_column($unpublished_row_last_run, 0));
+    if ($search_key > -1) {
+      $unpublished_rows_diffs[] = array($value, 0-$unpublished_row_last_run[$search_key][1]);
     }
   }
 
@@ -119,11 +145,7 @@ function gsb_public_statistics_send_status_mail() {
   }
 
   // Wrap unpublished data into table format
-  $body[] = theme('table', array(
-    'header' => array('<b>Unpublished Nodes</b>',''),
-    'rows' => $unpublished_rows,
-    'attributes' => array('width' => '60%')
-  ));
+  $body[] = gsb_public_statistics_render_table($unpublished_rows, array('<b>Unpublished Nodes</b>',''));
 
   // Get the mailing values.
   $eol = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
@@ -150,5 +172,27 @@ function gsb_public_statistics_send_status_mail() {
     $body = implode("<br />$eol", $body);
     drupal_set_message($body);
   }
+}
 
+/**
+ * Helper function gsb_public_statistics_render_table() gets table output.
+ */
+function gsb_public_statistics_render_table($rows, $header) {
+  $table = theme('table', array(
+     'header' => $header,
+     'rows' => $rows,
+     'attributes' => array('width' => '60%')
+  ));
+  return $table;
+}
+
+/**
+ * Helper function for array values
+ */
+function _gsb_public_statistics_array_values($array) {
+  $array_values = array();
+  foreach ($array as $value) {
+    $array_values[] = $value[0];
+  }
+  return $array_values;
 }
