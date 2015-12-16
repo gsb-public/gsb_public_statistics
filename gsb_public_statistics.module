@@ -127,24 +127,19 @@ function gsb_public_statistics_send_status_mail() {
 
   // Get the mailing values.
   $eol = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
-  $subject = 'GSB Public - Statistics';
   $to = variable_get('gsb_public_statistics_to_email', NULL);
   $from = variable_get('site_mail', 'webmaster@gsb.stanford.edu');
 
-  $body = implode("<br />$eol", $body);
-
+ // $body = implode("<br />$eol", $body);
   // Set the mail parameters
   $params = array(
-    'subject' => $subject,
-    'body' => check_markup(
-       $body,
-      'gsb_html_text'
-    ),
+    'body' => $body,
+    'subject' => t('GSB Public - Statistics'),
   );
 
   // Mail the gsb public statistics.
   if (variable_get('gsb_public_statistics_enable_email', '')) {
-    if (drupal_mail('gsb_public_statistics', 'statistics', $to, language_default(), $params, $from)) {
+    if ($message = drupal_mail('gsb_public_statistics', 'statistics', $to, language_default(), $params, $from)) {
       drupal_set_message(t('GSB public statistics was sent.'));
     }
     else {
@@ -152,6 +147,8 @@ function gsb_public_statistics_send_status_mail() {
     }
   }
   else {
+    $body = implode("<br />$eol", $body);
     drupal_set_message($body);
   }
+
 }
