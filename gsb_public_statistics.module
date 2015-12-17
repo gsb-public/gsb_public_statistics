@@ -102,7 +102,7 @@ function gsb_public_statistics_send_status_mail() {
 
   // Save the json format for published values
   variable_set('gsb_public_statistics_published_row_json', drupal_json_encode($published_rows));
-  array_unshift($published_rows_diffs, array('<b>Published Diffs</b>', ''));
+  array_unshift($published_rows_diffs, array('<h3>Published Diffs</h3>', ''));
   if (count($published_rows_diffs) > 1) {
     $published_rows = array_merge($published_rows, $published_rows_diffs);
   }
@@ -140,7 +140,7 @@ function gsb_public_statistics_send_status_mail() {
 
   // Save the json format for unpublished values
   variable_set('gsb_public_statistics_unpublished_row_json', drupal_json_encode($unpublished_rows));
-  array_unshift($unpublished_rows_diffs, array('<b>Unpublished Diffs</b>', ''));
+  array_unshift($unpublished_rows_diffs, array('<h3>Unpublished Diffs</h3>', ''));
   if (count($unpublished_rows_diffs) > 1) {
     $unpublished_rows = array_merge($unpublished_rows, $unpublished_rows_diffs);
   }
