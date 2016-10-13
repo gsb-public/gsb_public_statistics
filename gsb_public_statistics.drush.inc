@@ -15,7 +15,7 @@ function gsb_public_statistics_drush_command() {
     // Define the 'gps-stats' command.
     'gps-stats' => array(
       'description' => 'Perform gsb_public_statistics.',
-      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_DATABASE,
+      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
       'aliases' => array('gps'),
       'examples' => array('drush gps'),
     ),
