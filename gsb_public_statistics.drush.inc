@@ -1,3 +1,10 @@
+<?php
+
+/**
+ * @file
+ * Drush commands for GSB Public Statistics
+ */
+
 /**
  * Implements hook_drush_command().
  */
@@ -13,10 +20,10 @@ function gsb_public_statistics_drush_command() {
       'examples' => array('drush gps'),
     ),
 
-  };
+  );
 
 }
 
-function drush_gsb_public_statistics_gps_stats($v = ACQUIA_PURGE_SEVLEVEL_INFO) {
+function drush_gsb_public_statistics_gps_stats() {
   gsb_public_statistics_send_status_mail();
 }
