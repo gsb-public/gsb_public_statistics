@@ -152,7 +152,7 @@ function gsb_public_statistics_send_status_mail() {
   // Get the mailing values.
   $eol = variable_get('mail_line_endings', MAIL_LINE_ENDINGS);
   $to = variable_get('gsb_public_statistics_to_email', NULL);
-  $from = variable_get('site_mail', 'webmaster@gsb.stanford.edu');
+  $from = variable_get('site_mail', 'webmaster@stanford.edu');
 
  // $body = implode("<br />$eol", $body);
   // Set the mail parameters
